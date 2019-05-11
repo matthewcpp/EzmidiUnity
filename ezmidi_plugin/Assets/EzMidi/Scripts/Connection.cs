@@ -71,8 +71,6 @@ namespace EzMidi
 
             Debug.Log("Created ezmidi Context!");
             isInit = true;
-
-            Native.ezmidi_connect_source(ezmidiContext, 0);
         }
 
         public List<String> GetSourceNames()
@@ -95,7 +93,8 @@ namespace EzMidi
 
         public void ConnectSource(int index)
         {
-            Native.ezmidi_connect_source(ezmidiContext, index);
+            if (isInit)
+                Native.ezmidi_connect_source(ezmidiContext, index);
         }
 
         private void OnDestroy()
