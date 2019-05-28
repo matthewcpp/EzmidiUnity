@@ -10,7 +10,7 @@ namespace EzMidi
         private IntPtr ezmidiContext = IntPtr.Zero;
         private bool isInit;
 
-        public delegate void NoteEvent(int note, int velocity);
+        public delegate void NoteEvent(int channel, int note, int velocity);
         public delegate void LogEvent(string message);
 
         public NoteEvent NoteOn;
@@ -18,6 +18,8 @@ namespace EzMidi
         public LogEvent Log;
 
         private Native.Ezmidi_Event midiEvent = new Native.Ezmidi_Event();
+
+        public bool IsConnected { get { return GetConnected(); } }
 
         void Awake()
         {
@@ -28,7 +30,7 @@ namespace EzMidi
         {
             if (!isInit) return;
 
-            while (Native.ezmidi_pump_events(ezmidiContext, ref midiEvent) != 0)
+            while (Native.ezmidi_get_next_event(ezmidiContext, ref midiEvent) != 0)
             {
                 switch (midiEvent.type)
                 {
@@ -44,13 +46,21 @@ namespace EzMidi
             switch (ezmidiEvent.note_event.detail)
             {
                 case Native.Ezmidi_NoteEventId.EZMIDI_NOTEEVENT_ON:
-                    NoteOn(ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
+                    NoteOn(ezmidiEvent.note_event.channel, ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
                     break;
 
                 case Native.Ezmidi_NoteEventId.EZMIDI_NOTEEVENT_OFF:
-                    NoteOff(ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
+                    NoteOff(ezmidiEvent.note_event.channel, ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
                     break;
             }
+        }
+
+        private bool GetConnected()
+        {
+            if (isInit)
+                return false;
+
+            return Native.ezmidi_has_source_connected(ezmidiContext) != 0;
         }
 
         private static void LogMessage(string message, IntPtr user_data)
@@ -95,6 +105,12 @@ namespace EzMidi
         {
             if (isInit)
                 Native.ezmidi_connect_source(ezmidiContext, index);
+        }
+
+        public void DisconnectSource()
+        {
+            if (isInit)
+                Native.ezmidi_disconnect_source(ezmidiContext);
         }
 
         private void OnDestroy()
