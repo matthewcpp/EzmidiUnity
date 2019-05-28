@@ -57,7 +57,7 @@ namespace EzMidi
 
         private bool GetConnected()
         {
-            if (isInit)
+            if (!isInit)
                 return false;
 
             return Native.ezmidi_has_source_connected(ezmidiContext) != 0;
