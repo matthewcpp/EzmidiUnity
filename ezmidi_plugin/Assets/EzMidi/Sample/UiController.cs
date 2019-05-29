@@ -6,6 +6,7 @@ public class UiController : MonoBehaviour {
 
     public EzMidi.Connection EzMidi;
     public Dropdown MidiSourcesDropdown;
+    public Text ButtonText;
 
 	void Start ()
     {
@@ -17,6 +18,20 @@ public class UiController : MonoBehaviour {
 
         MidiSourcesDropdown.options = dropdownOptions;
     }
+
+    public void OnConnectionButtonClick()
+    {
+        if (EzMidi.IsConnected)
+        {
+            DisconnectSource();
+            ButtonText.text = "Connect";
+        }
+        else
+        {
+            ConnectSelectedSource();
+            ButtonText.text = "Disconnect";
+        }
+    }
 	
     public void ConnectSelectedSource()
     {
@@ -27,13 +42,22 @@ public class UiController : MonoBehaviour {
         EzMidi.ConnectSource(MidiSourcesDropdown.value);
     }
 
-    void DebugNoteOn(int note, int velocity)
+    public void DisconnectSource()
     {
-        Debug.Log(string.Format("Note On: {0}, velocity: {1}", note, velocity));
+        EzMidi.NoteOn -= DebugNoteOn;
+        EzMidi.NoteOff -= DebugNoteOff;
+
+        EzMidi.DisconnectSource();
     }
 
-    void DebugNoteOff(int note, int velocity)
+
+    void DebugNoteOn(int channel, int note, int velocity)
     {
-        Debug.Log(string.Format("Note Off: {0}, velocity: {1}", note, velocity));
+        Debug.Log(string.Format("Note On: {0}, velocity: {1}, channel: {2}", note, velocity, channel));
+    }
+
+    void DebugNoteOff(int channel, int note, int velocity)
+    {
+        Debug.Log(string.Format("Note Off: {0}, velocity: {1}, channel: {2}", note, velocity, channel));
     }
 }
