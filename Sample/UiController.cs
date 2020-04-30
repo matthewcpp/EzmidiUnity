@@ -21,7 +21,7 @@ public class UiController : MonoBehaviour {
 
     public void OnConnectionButtonClick()
     {
-        if (EzMidi.IsConnected)
+        if (EzMidi.isConnected)
         {
             DisconnectSource();
             ButtonText.text = "Connect";

@@ -19,7 +19,7 @@ namespace EzMidi
 
         private Native.Ezmidi_Event midiEvent = new Native.Ezmidi_Event();
 
-        public bool IsConnected { get { return GetConnected(); } }
+        public bool isConnected { get { return GetConnected(); } }
 
         void Awake()
         {
@@ -123,14 +123,6 @@ namespace EzMidi
 
                 Debug.Log("Destroyed ezmidi Context!");
             }
-        }
-    }
-
-    public class Exception : System.Exception
-    {
-        public Exception(string message)
-                : base(message)
-        {
         }
     }
 }
