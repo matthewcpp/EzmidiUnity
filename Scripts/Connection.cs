@@ -20,6 +20,7 @@ namespace EzMidi
         private Native.Ezmidi_Event midiEvent = new Native.Ezmidi_Event();
 
         public bool isConnected { get { return GetConnected(); } }
+        public HashSet<int> notesOn { get; } = new HashSet<int>();
 
         void Awake()
         {
@@ -46,11 +47,13 @@ namespace EzMidi
             switch (ezmidiEvent.note_event.detail)
             {
                 case Native.Ezmidi_NoteEventId.EZMIDI_NOTEEVENT_ON:
-                    NoteOn(ezmidiEvent.note_event.channel, ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
+                    notesOn.Add(ezmidiEvent.note_event.note);
+                    NoteOn?.Invoke(ezmidiEvent.note_event.channel, ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
                     break;
 
                 case Native.Ezmidi_NoteEventId.EZMIDI_NOTEEVENT_OFF:
-                    NoteOff(ezmidiEvent.note_event.channel, ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
+                    notesOn.Remove(ezmidiEvent.note_event.note);
+                    NoteOff?.Invoke(ezmidiEvent.note_event.channel, ezmidiEvent.note_event.note, ezmidiEvent.note_event.velocity);
                     break;
             }
         }
